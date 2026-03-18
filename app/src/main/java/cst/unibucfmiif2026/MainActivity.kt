@@ -18,25 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import cst.unibucfmiif2026.ui.theme.UniBucFMIIF2026Theme
 
-fun Int.isAgeValid() = this >= 18
-fun String?.isNameValid(): Boolean = this?.let { length >= 3 } ?: false
-
-enum class Colors(id: Int, nameResId: Int, colorResId: Int) {
-	GREEN(0, R.string.green, R.color.green),
-	YELLOW(1, R.string.yellow, R.color.yellow),
-	RED(2, R.string.red, R.color.red)
-}
-
 class MainActivity : ComponentActivity() {
-
-	val firstName: String = "Name"
-	var lastName: String? = ""
-
-	val age: Int by lazy {
-		18
-	}
-
-	lateinit var address: String
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -51,40 +33,6 @@ class MainActivity : ComponentActivity() {
 				}
 			}
 		}
-
-		MySingleton.firstName
-
-		lastName?.length
-
-		var myName: String = lastName ?: firstName
-
-		lastName?.apply {
-			Log.e("TAG", "${this.length}")
-			Log.e("TAG", "${this@MainActivity.firstName.length}")
-		}
-
-		myName = lastName?.let { ln ->
-			"$ln $firstName"
-		} ?: "Unknown"
-
-		if (age.isAgeValid()) {
-			Log.e("TAG", "Age is valid")
-		} else {
-			Log.e("TAG", "Age is not valid")
-		}
-
-		if (firstName.isNameValid() && lastName.isNameValid()) {
-			Log.e("TAG", "Name is valid")
-		} else {
-			Log.e("TAG", "Name is not valid")
-		}
-
-		address.length
-		address = "Address"
-
-		lastName = null
-
-		Log.e("TAG", "$age")
 		Log.e("TAG", "onCreate:")
 	}
 
