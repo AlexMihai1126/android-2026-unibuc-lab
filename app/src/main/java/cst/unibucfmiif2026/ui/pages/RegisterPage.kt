@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import cst.unibucfmiif2026.ui.theme.UniBucFMIIF2026Theme
 import cst.unibucfmiif2026.utils.isValidEmail
 import cst.unibucfmiif2026.utils.isValidPassword
@@ -42,7 +44,10 @@ import cst.unibucfmiif2026.utils.isValidPassword
 @Composable
 fun RegisterPage(
     onLoginClick: () -> Unit = {},
-    onRegisterClick: () -> Unit = {}
+    onRegisterClick: (email:String, password: String, onSuccess: () -> Unit) -> Unit = {_, _, _ ->},
+    onRegisterSuccess : () -> Unit = {},
+    isLoading: Boolean = false,
+    errorMessage: String? = null
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -150,20 +155,30 @@ fun RegisterPage(
         Button(
             onClick = {
                 var isValid = true
-                if(!email.isValidEmail()) {
+                if (!email.isValidEmail()) {
                     emailError = invalidEmailMessage
                     isValid = false
                 }
 
-                if(!password.isValidPassword()) {
+                if (!password.isValidPassword()) {
                     passwordError = invalidPasswordMessage
                     isValid = false
                 }
 
-                if(isValid) onRegisterClick()
+                if (isValid) onRegisterClick(
+                    email,
+                    password,
+                    onRegisterSuccess
+                )
             },
-            modifier = Modifier.fillMaxWidth()
-        ) { Text(stringResource(R.string.register)) }
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
+        ) {
+            when (isLoading) {
+                true -> CircularProgressIndicator(modifier = Modifier.height(24.dp), strokeWidth = 2.dp)
+                false -> Text(stringResource(R.string.register))
+            }
+        }
 
         TextButton(onClick = onLoginClick) { Text(stringResource(R.string.goto_login)) }
     }

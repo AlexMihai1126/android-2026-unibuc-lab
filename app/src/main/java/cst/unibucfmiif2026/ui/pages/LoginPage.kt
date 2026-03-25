@@ -40,7 +40,9 @@ import cst.unibucfmiif2026.ui.theme.UniBucFMIIF2026Theme
 @Composable
 fun LoginPage(
     onRegisterClick: () -> Unit = {},
-    onLoginClick: () -> Unit = {}
+    onLoginClick: () -> Unit = {},
+    isLoading : Boolean = false,
+    errorMessage : String? = null
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
