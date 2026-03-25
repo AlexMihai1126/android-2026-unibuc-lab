@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import cst.unibucfmiif2026.ui.navigation.AuthNavigation
 import cst.unibucfmiif2026.ui.theme.UniBucFMIIF2026Theme
 
 class MainActivity : ComponentActivity() {
@@ -25,12 +26,7 @@ class MainActivity : ComponentActivity() {
 		enableEdgeToEdge()
 		setContent {
 			UniBucFMIIF2026Theme {
-				Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-					Greeting(
-						name = "Android",
-						modifier = Modifier.padding(innerPadding)
-					)
-				}
+				AuthNavigation()
 			}
 		}
 		Log.e("TAG", "onCreate:")
@@ -94,5 +90,13 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 fun GreetingPreview() {
 	UniBucFMIIF2026Theme {
 		Greeting("Android")
+	}
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AuthNavPreview() {
+	UniBucFMIIF2026Theme {
+		AuthNavigation()
 	}
 }

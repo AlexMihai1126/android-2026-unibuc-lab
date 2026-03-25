@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,18 +36,26 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import cst.unibucfmiif2026.ui.theme.UniBucFMIIF2026Theme
+import cst.unibucfmiif2026.utils.isValidEmail
+import cst.unibucfmiif2026.utils.isValidPassword
 
 @Composable
-fun LoginPage(
-    onRegisterClick: () -> Unit = {},
+fun RegisterPage(
     onLoginClick: () -> Unit = {},
-    isLoading : Boolean = false,
-    errorMessage : String? = null
+    onRegisterClick: (email:String, password: String, onSuccess: () -> Unit) -> Unit = {_, _, _ ->},
+    onRegisterSuccess : () -> Unit = {},
+    isLoading: Boolean = false,
+    errorMessage: String? = null
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
+    var emailError by remember { mutableStateOf<String?>(null) }
+    var passwordError by remember { mutableStateOf<String?>(null) }
+    val invalidEmailMessage = stringResource(R.string.invalid_email)
+    val invalidPasswordMessage = stringResource(R.string.invalid_password)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -61,7 +70,7 @@ fun LoginPage(
         )
 
         Text(
-            text = stringResource(R.string.login_page),
+            text = stringResource(R.string.register_page),
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.primary
         )
@@ -72,6 +81,7 @@ fun LoginPage(
             value = email,
             onValueChange = { newValue ->
                 email = newValue
+                emailError = null
             },
             label = {
                 Text(stringResource(R.string.email))
@@ -81,6 +91,12 @@ fun LoginPage(
                     imageVector = Icons.Default.Email,
                     contentDescription = null
                 )
+            },
+            isError = emailError != null,
+            supportingText = emailError?.let { errorMessage ->
+                {
+                    Text(errorMessage)
+                }
             },
             singleLine = true,
             keyboardOptions = KeyboardOptions(
@@ -96,6 +112,7 @@ fun LoginPage(
             value = password,
             onValueChange = { newValue ->
                 password = newValue
+                passwordError = null
             },
             label = {
                 Text(stringResource(R.string.password))
@@ -117,6 +134,12 @@ fun LoginPage(
                     )
                 }
             },
+            isError = passwordError != null,
+            supportingText = passwordError?.let { errorMessage ->
+                {
+                    Text(errorMessage)
+                }
+            },
             visualTransformation = if (isPasswordVisible)
                 VisualTransformation.None else PasswordVisualTransformation(),
             singleLine = true,
@@ -130,18 +153,41 @@ fun LoginPage(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = onLoginClick,
-            modifier = Modifier.fillMaxWidth()
-        ) { Text(stringResource(R.string.login))}
+            onClick = {
+                var isValid = true
+                if (!email.isValidEmail()) {
+                    emailError = invalidEmailMessage
+                    isValid = false
+                }
 
-        TextButton(onClick = onRegisterClick) { Text(stringResource(R.string.goto_register)) }
+                if (!password.isValidPassword()) {
+                    passwordError = invalidPasswordMessage
+                    isValid = false
+                }
+
+                if (isValid) onRegisterClick(
+                    email,
+                    password,
+                    onRegisterSuccess
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
+        ) {
+            when (isLoading) {
+                true -> CircularProgressIndicator(modifier = Modifier.height(24.dp), strokeWidth = 2.dp)
+                false -> Text(stringResource(R.string.register))
+            }
+        }
+
+        TextButton(onClick = onLoginClick) { Text(stringResource(R.string.goto_login)) }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun LoginPagePreview() {
+fun RegisterPagePreview() {
     UniBucFMIIF2026Theme {
-        LoginPage()
+        RegisterPage()
     }
 }
