@@ -18,4 +18,9 @@
     <string name="goto_login" translatable="false">Already have an account? Login</string>
     <string name="invalid_email" translatable="false">Email is invalid</string>
     <string name="invalid_password" translatable="false">Password must be longer than 6 characters</string>
+    <string name="firstname" translatable="false">First name</string>
+    <string name="lastname" translatable="false">Last name</string>
+    <string name="invalid_firstname" translatable="false">First name is invalid</string>
+    <string name="invalid_lastname" translatable="false">Last name is invalid</string>
+    <string name="add_user" translatable="false">Add user</string>
 </resources>

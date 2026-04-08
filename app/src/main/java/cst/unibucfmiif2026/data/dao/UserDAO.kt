@@ -6,17 +6,16 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import cst.unibucfmiif2026.data.entities.UserEntity
+import cst.unibucfmiif2026.data.entities.UserWithAddress
 
 @Dao
 interface UserDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(user: UserEntity)
+    suspend fun insert(user: UserEntity) : Long
 
     @Delete
-    fun delete(user: UserEntity)
+    suspend fun delete(user: UserEntity)
 
-    @Query("""
-        SELECT * FROM users WHERE id = :id
-    """)
-    fun getById(id: Long)
+    @Query("SELECT * FROM users WHERE id = :id")
+    suspend fun getById(id: Long) : UserWithAddress
 }
