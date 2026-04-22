@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import cst.unibucfmiif2026.data.entities.UserEntity
-import cst.unibucfmiif2026.data.entities.UserWithAddress
+import cst.unibucfmiif2026.data.entities.AddressWithUser
 
 @Dao
 interface UserDAO {
@@ -15,7 +15,4 @@ interface UserDAO {
 
     @Delete
     suspend fun delete(user: UserEntity)
-
-    @Query("SELECT * FROM users WHERE id = :id")
-    suspend fun getById(id: Long) : UserWithAddress
 }

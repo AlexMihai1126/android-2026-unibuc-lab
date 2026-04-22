@@ -9,7 +9,7 @@ import cst.unibucfmiif2026.data.entities.AddressEntity
 import cst.unibucfmiif2026.data.entities.UserEntity
 import kotlinx.coroutines.launch
 
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
+class AddressDetailsViewModel(application: Application) : AndroidViewModel(application) {
     private val userDao = AppDatabase.getInstance(application).userDao()
     private val addressDao = AppDatabase.getInstance(application).addressDao()
     fun addUser(firstname: String, lastname: String) {

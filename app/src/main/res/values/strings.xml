@@ -8,6 +8,7 @@
     <string name="red">Red</string>
 
     <string name="welcome" translatable="false">Welcome</string>
+    <string name="logout_btn" translatable="false">Logout</string>
     <string name="login_page" translatable="false">Login page</string>
     <string name="register_page" translatable="false">Register page</string>
     <string name="password" translatable="false">Password</string>
@@ -23,4 +24,13 @@
     <string name="invalid_firstname" translatable="false">First name is invalid</string>
     <string name="invalid_lastname" translatable="false">Last name is invalid</string>
     <string name="add_user" translatable="false">Add user</string>
+    <string name="address_details_title" translatable="false">Address details</string>
+    <string name="addresses_page_title" translatable="false">Addresses</string>
+    <string name="goto_addresses_btn" translatable="false">Go to addresses</string>
+    <string name="add_address" translatable="false">Add address</string>
+    <string name="street" translatable="false">Street</string>
+    <string name="city" translatable="false">City</string>
+    <string name="invalid_street" translatable="false">Street name is invalid</string>
+    <string name="invalid_city" translatable="false">City name is invalid</string>
+    <string name="no_addresses_found" translatable="false">No addresses found</string>
 </resources>
