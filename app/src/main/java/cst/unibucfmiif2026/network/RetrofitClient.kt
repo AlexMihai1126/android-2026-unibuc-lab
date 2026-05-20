@@ -14,6 +14,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
     private const val BASE_URL = "https://reqres.in/"
+    private const val LOCAL_BASE_URL = "http://10.0.2.2:3000"
     private val apiKeyInterceptor = Interceptor { chain ->
         val request = chain
             .request()
@@ -55,6 +56,15 @@ object RetrofitClient {
     val usersApi : UsersApiService by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
+            .client(okHttpClientAuthorized)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(UsersApiService::class.java)
+    }
+
+    val usersLocalApi : UsersApiService by lazy {
+        Retrofit.Builder()
+            .baseUrl(LOCAL_BASE_URL)
             .client(okHttpClientAuthorized)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

@@ -1,6 +1,11 @@
 package cst.unibucfmiif2026.ui.pages
 
+import android.Manifest
 import android.app.Application
+import android.content.pm.PackageManager
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,17 +15,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddPhotoAlternate
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Person2
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,11 +49,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import cst.unibucfmiif2026.R
 import cst.unibucfmiif2026.data.entities.UserEntity
 import cst.unibucfmiif2026.ui.theme.UniBucFMIIF2026Theme
+import cst.unibucfmiif2026.utils.createImageUri
+import cst.unibucfmiif2026.utils.isValidEmail
 import cst.unibucfmiif2026.utils.isValidName
 import cst.unibucfmiif2026.viewmodel.AddressDetailsViewModel
 
@@ -89,8 +102,11 @@ fun AddressDetailsPage(id: Long) {
 fun AddressDetailsHeader(viewModel: AddressDetailsViewModel) {
     var firstname by remember { mutableStateOf("") }
     var lastname by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var emailError by remember { mutableStateOf<String?>(null) }
     var firstnameError by remember { mutableStateOf<String?>(null) }
     var lastnameError by remember { mutableStateOf<String?>(null) }
+    val invalidEmailMessage = stringResource(R.string.invalid_email)
     val invalidFirstnameMessage = stringResource(R.string.invalid_firstname)
     val invalidLastnameMessage = stringResource(R.string.invalid_lastname)
 
@@ -170,6 +186,42 @@ fun AddressDetailsHeader(viewModel: AddressDetailsViewModel) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        OutlinedTextField(
+            value = email,
+            onValueChange = { newValue ->
+                email = newValue
+                emailError = null
+
+            },
+            label = {
+                Text(stringResource(R.string.email))
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Email,
+                    contentDescription = null
+                )
+            },
+            singleLine = true,
+            isError = emailError != null,
+            supportingText = emailError?.let { errorMessage ->
+                {
+                    Text(errorMessage)
+                }
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        PhotoPicker()
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Button(
             onClick = {
                 var isValid = true
@@ -180,6 +232,11 @@ fun AddressDetailsHeader(viewModel: AddressDetailsViewModel) {
 
                 if (!lastname.isValidName()) {
                     lastnameError = invalidLastnameMessage
+                    isValid = false
+                }
+
+                if (!email.isValidEmail()) {
+                    emailError = invalidEmailMessage
                     isValid = false
                 }
 
@@ -197,6 +254,40 @@ fun AddressDetailsHeader(viewModel: AddressDetailsViewModel) {
 //                false ->
 //            }
             Text(stringResource(R.string.add_user))
+        }
+
+        Button(
+            onClick = {
+                var isValid = true
+                if (!firstname.isValidName()) {
+                    firstnameError = invalidFirstnameMessage
+                    isValid = false
+                }
+
+                if (!lastname.isValidName()) {
+                    lastnameError = invalidLastnameMessage
+                    isValid = false
+                }
+
+                if (!email.isValidEmail()) {
+                    emailError = invalidEmailMessage
+                    isValid = false
+                }
+
+                if (isValid) viewModel.addUser(firstname = firstname, lastname = lastname)
+            },
+            modifier = Modifier.fillMaxWidth(),
+            // enabled = !isLoading
+        ) {
+//            when (isLoading) {
+//                true -> CircularProgressIndicator(
+//                    modifier = Modifier.size(24.dp),
+//                    strokeWidth = 2.dp
+//                )
+//
+//                false ->
+//            }
+            Text(stringResource(R.string.add_user_local_api))
         }
 
 //        errorMessage?.let { errMsg ->
@@ -218,6 +309,92 @@ fun AddressDetailsHeader(viewModel: AddressDetailsViewModel) {
         }
     }
 
+}
+
+@Composable
+fun PhotoPicker(uri: Uri? = null) {
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var pendingCameraImageUri by remember { mutableStateOf<Uri?>(null) }
+    val context = LocalContext.current
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        selectedImageUri = uri
+    }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { isSuccess ->
+        if (isSuccess) {
+            selectedImageUri = pendingCameraImageUri
+        }
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            val imageUri = context.createImageUri()
+            pendingCameraImageUri = imageUri
+            cameraLauncher.launch(imageUri)
+        }
+    }
+
+    val openCamera = {
+        val imageUri = context.createImageUri()
+        pendingCameraImageUri = imageUri
+        cameraLauncher.launch(imageUri)
+    }
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    selectedImageUri?.let { imageUri ->
+        AsyncImage(
+            model = imageUri,
+            contentDescription = stringResource(R.string.user_image_preview),
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(96.dp)
+                .clip(CircleShape)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        OutlinedButton(
+            modifier = Modifier.weight(1f),
+            onClick = { imagePickerLauncher.launch("image/*") }
+        ) {
+            Icon(
+                imageVector = Icons.Default.AddPhotoAlternate,
+                contentDescription = null
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(stringResource(R.string.choose_image))
+        }
+
+        OutlinedButton(
+            modifier = Modifier.weight(1f),
+            onClick = {
+                when (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)) {
+                    PackageManager.PERMISSION_GRANTED -> openCamera()
+                    else -> cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                }
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Default.PhotoCamera,
+                contentDescription = null
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(stringResource(R.string.take_photo))
+        }
+    }
 }
 
 @Composable

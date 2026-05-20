@@ -37,4 +37,8 @@
     <string name="invalid_city" translatable="false">City name is invalid</string>
     <string name="no_addresses_found" translatable="false">No addresses found</string>
     <string name="no_users_found" translatable="false">No users found</string>
+    <string name="user_image_preview">Image preview</string>
+    <string name="choose_image">Choose an image</string>
+    <string name="take_photo">Take a photo</string>
+    <string name="add_user_local_api">Add user to local API</string>
 </resources>
