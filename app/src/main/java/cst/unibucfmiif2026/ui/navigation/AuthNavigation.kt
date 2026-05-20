@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -21,7 +22,7 @@ import cst.unibucfmiif2026.ui.pages.RegisterPage
 import cst.unibucfmiif2026.viewmodel.AuthViewModel
 
 @Composable
-fun AuthNavigation(authViewModel: AuthViewModel = viewModel()) {
+fun AuthNavigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel = viewModel()) {
     val navController = rememberNavController()
     val authState by authViewModel.authState.collectAsState()
     val isLoggedInApiState by authViewModel.hasLoggedInApi.collectAsState()
@@ -32,7 +33,7 @@ fun AuthNavigation(authViewModel: AuthViewModel = viewModel()) {
     }
     val context = LocalContext.current
 
-    NavHost(navController, startDestination = startDestination) {
+    NavHost(navController, startDestination = startDestination, modifier = modifier) {
         composable("login") {
             LoginPage(
                 onRegisterClick = {
