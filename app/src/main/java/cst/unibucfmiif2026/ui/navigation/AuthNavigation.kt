@@ -14,8 +14,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import cst.unibucfmiif2026.MainActivity
+import cst.unibucfmiif2026.network.RetrofitClient
+import cst.unibucfmiif2026.network.api.UsersApiService
 import cst.unibucfmiif2026.ui.pages.AddressDetailsPage
 import cst.unibucfmiif2026.ui.pages.AddressesPage
+import cst.unibucfmiif2026.ui.pages.FirebaseBackendAuthTestPage
 import cst.unibucfmiif2026.ui.pages.HomePage
 import cst.unibucfmiif2026.ui.pages.LoginPage
 import cst.unibucfmiif2026.ui.pages.RegisterPage
@@ -85,8 +88,12 @@ fun AuthNavigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel =
                         this.finish()
                     }
                 },
-                gotoAddresses = { navController.navigate("addresses_page") }
+                gotoAddresses = { navController.navigate("test_backend_auth") }
             )
+        }
+
+        composable("test_backend_auth") {
+            FirebaseBackendAuthTestPage(usersApiService = RetrofitClient.usersApi)
         }
     }
 }

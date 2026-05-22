@@ -1,5 +1,6 @@
 package cst.unibucfmiif2026.network.api
 
+import cst.unibucfmiif2026.network.dto.PermissionsResponse
 import cst.unibucfmiif2026.network.dto.UsersResponse
 import okhttp3.MultipartBody
 import retrofit2.Response
@@ -21,4 +22,7 @@ interface UsersApiService {
         @Part("email") email: String,
         @Part("avatar") avatar : MultipartBody.Part
     ) : Response<Unit>
+
+    @GET("api/permissions")
+    suspend fun getPermissions() : Response<PermissionsResponse>
 }

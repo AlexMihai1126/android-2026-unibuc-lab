@@ -59,10 +59,6 @@ fun LoginPage(
     var passwordError by remember { mutableStateOf<String?>(null) }
     val invalidEmailMessage = stringResource(R.string.invalid_email)
     val invalidPasswordMessage = stringResource(R.string.invalid_password)
-    if (BuildConfig.DEBUG) {
-        email = "eve.holt@reqres.in"
-        password = "cityslicka"
-    }
     Column(
         modifier = Modifier
             .fillMaxSize()

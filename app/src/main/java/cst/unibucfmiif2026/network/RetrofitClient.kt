@@ -1,11 +1,13 @@
 package cst.unibucfmiif2026.network
 
+import com.google.firebase.auth.FirebaseAuth
 import cst.unibucfmiif2026.BuildConfig
 import cst.unibucfmiif2026.data.AuthDataStore
 import cst.unibucfmiif2026.network.api.AuthApiService
 import cst.unibucfmiif2026.network.api.UsersApiService
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -36,6 +38,26 @@ object RetrofitClient {
         chain.proceed(request)
     }
 
+    private val firebaseAuthTokenInterceptor = Interceptor { chain ->
+        val token = runBlocking {
+            FirebaseAuth.getInstance()
+                .currentUser
+                ?.getIdToken(false)
+                ?.await()
+                ?.token
+        }
+
+        val requestBuilder = chain
+            .request()
+            .newBuilder()
+
+        if (!token.isNullOrBlank()) {
+            requestBuilder.addHeader("Authorization", "Bearer $token")
+        }
+
+        chain.proceed(requestBuilder.build())
+    }
+
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
@@ -49,13 +71,13 @@ object RetrofitClient {
     private val okHttpClientAuthorized = OkHttpClient
         .Builder()
         .addInterceptor(apiKeyInterceptor)
-        .addInterceptor(authTokenInterceptor)
+        .addInterceptor(firebaseAuthTokenInterceptor)
         .addInterceptor(loggingInterceptor)
         .build()
 
     val usersApi : UsersApiService by lazy {
         Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(LOCAL_BASE_URL)
             .client(okHttpClientAuthorized)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
