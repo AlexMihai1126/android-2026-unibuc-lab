@@ -72,7 +72,6 @@ class AddressDetailsViewModel(application: Application, val addressId: Long) :
 
     // TODO - split navigation file
     // TODO - create reusable composables from form inputs
-    // TODO - improve loading page at app first startup
 
     fun loadUsers() {
         viewModelScope.launch {
