@@ -109,6 +109,7 @@ fun AddressDetailsHeader(viewModel: AddressDetailsViewModel) {
     val invalidEmailMessage = stringResource(R.string.invalid_email)
     val invalidFirstnameMessage = stringResource(R.string.invalid_firstname)
     val invalidLastnameMessage = stringResource(R.string.invalid_lastname)
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
     Column(
         modifier = Modifier
@@ -218,7 +219,9 @@ fun AddressDetailsHeader(viewModel: AddressDetailsViewModel) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        PhotoPicker()
+        PhotoPicker {uri ->
+            selectedImageUri = uri
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -274,7 +277,7 @@ fun AddressDetailsHeader(viewModel: AddressDetailsViewModel) {
                     isValid = false
                 }
 
-                if (isValid) viewModel.addUser(firstname = firstname, lastname = lastname)
+                 if (isValid) viewModel.addUserToApi(firstname = firstname, lastname = lastname, email = email, avatar = selectedImageUri)
             },
             modifier = Modifier.fillMaxWidth(),
             // enabled = !isLoading
@@ -312,7 +315,7 @@ fun AddressDetailsHeader(viewModel: AddressDetailsViewModel) {
 }
 
 @Composable
-fun PhotoPicker(uri: Uri? = null) {
+fun PhotoPicker(onImageSelected : (Uri?) -> Unit) {
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var pendingCameraImageUri by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
@@ -320,6 +323,7 @@ fun PhotoPicker(uri: Uri? = null) {
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
+        onImageSelected(uri)
         selectedImageUri = uri
     }
 
@@ -327,6 +331,7 @@ fun PhotoPicker(uri: Uri? = null) {
         contract = ActivityResultContracts.TakePicture()
     ) { isSuccess ->
         if (isSuccess) {
+            onImageSelected(pendingCameraImageUri)
             selectedImageUri = pendingCameraImageUri
         }
     }

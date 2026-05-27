@@ -9,6 +9,7 @@ import cst.unibucfmiif2026.network.dto.LoginRequestDTO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -17,16 +18,27 @@ data class AuthState(
     val errorMessage: String? = null
 )
 
+enum class ApiAuthState {
+    LOADING,
+    LOGGED_IN,
+    LOGGED_OUT
+}
+
 class AuthViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val _authState = MutableStateFlow(AuthState())
     val authState = _authState.asStateFlow()
     val isLoggedInFirebase: Boolean
         get() = auth.currentUser != null
-    val hasLoggedInApi = AuthDataStore.tokenFlow.stateIn(
+    val apiAuthState = AuthDataStore.tokenFlow.map{ token ->
+        when(token.isNullOrBlank()) {
+            false -> ApiAuthState.LOGGED_IN
+            else -> ApiAuthState.LOGGED_OUT
+        }
+    }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = null
+        initialValue = ApiAuthState.LOADING
     )
 
     fun loginWithFirebase(email: String, password: String, onSuccess: () -> Unit) {

@@ -39,6 +39,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cst.unibucfmiif2026.BuildConfig
+import cst.unibucfmiif2026.ui.components.EmailInputField
 import cst.unibucfmiif2026.ui.theme.UniBucFMIIF2026Theme
 import cst.unibucfmiif2026.utils.isValidEmail
 import cst.unibucfmiif2026.utils.isValidPassword
@@ -46,11 +47,11 @@ import cst.unibucfmiif2026.utils.isValidPassword
 @Composable
 fun LoginPage(
     onRegisterClick: () -> Unit = {},
-    onLoginClickFirebase: (email:String, password: String, onSuccess: () -> Unit) -> Unit = { _, _, _ ->},
-    onLoginClickApi: (email:String, password: String, onSuccess: () -> Unit) -> Unit = { _, _, _ ->},
-    onLoginSuccess : () -> Unit = {},
-    isLoading : Boolean = false,
-    errorMessage : String? = null
+    onLoginClickFirebase: (email: String, password: String, onSuccess: () -> Unit) -> Unit = { _, _, _ -> },
+    onLoginClickApi: (email: String, password: String, onSuccess: () -> Unit) -> Unit = { _, _, _ -> },
+    onLoginSuccess: () -> Unit = {},
+    isLoading: Boolean = false,
+    errorMessage: String? = null
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -84,35 +85,15 @@ fun LoginPage(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        OutlinedTextField(
+        EmailInputField(
+            modifier = Modifier,
             value = email,
-            onValueChange = { newValue ->
-                email = newValue
-                emailError = null
-
-            },
-            label = {
-                Text(stringResource(R.string.email))
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Email,
-                    contentDescription = null
-                )
-            },
-            singleLine = true,
-            isError = emailError != null,
-            supportingText = emailError?.let { errorMessage ->
-                {
-                    Text(errorMessage)
-                }
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next
-            ),
-            modifier = Modifier.fillMaxWidth()
-        )
+            errorMessage = emailError,
+            imeAction = ImeAction.Next
+        ) { newValue ->
+            email = newValue
+            emailError = null
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -177,12 +158,17 @@ fun LoginPage(
                     email,
                     password,
                     onLoginSuccess
-                ) },
+                )
+            },
             modifier = Modifier.fillMaxWidth(),
             enabled = !isLoading
         ) {
             when (isLoading) {
-                true -> CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                true -> CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.dp
+                )
+
                 false -> Text(stringResource(R.string.login_firebase))
             }
         }
@@ -204,12 +190,17 @@ fun LoginPage(
                     email,
                     password,
                     onLoginSuccess
-                ) },
+                )
+            },
             modifier = Modifier.fillMaxWidth(),
             enabled = !isLoading
         ) {
             when (isLoading) {
-                true -> CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                true -> CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.dp
+                )
+
                 false -> Text(stringResource(R.string.login_api))
             }
         }
