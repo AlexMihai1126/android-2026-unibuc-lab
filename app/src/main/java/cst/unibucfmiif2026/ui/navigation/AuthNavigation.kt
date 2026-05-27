@@ -2,9 +2,13 @@ package cst.unibucfmiif2026.ui.navigation
 
 import android.app.Activity
 import android.content.Intent
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -19,18 +23,32 @@ import cst.unibucfmiif2026.ui.pages.AddressesPage
 import cst.unibucfmiif2026.ui.pages.HomePage
 import cst.unibucfmiif2026.ui.pages.LoginPage
 import cst.unibucfmiif2026.ui.pages.RegisterPage
+import cst.unibucfmiif2026.viewmodel.ApiAuthState
 import cst.unibucfmiif2026.viewmodel.AuthViewModel
 
 @Composable
 fun AuthNavigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel = viewModel()) {
     val navController = rememberNavController()
     val authState by authViewModel.authState.collectAsState()
-    val isLoggedInApiState by authViewModel.hasLoggedInApi.collectAsState()
+    val apiAuthState by authViewModel.apiAuthState.collectAsState()
     val navigateToHome: () -> Unit = { navController.navigate("homepage") }
-    val startDestination = when (authViewModel.isLoggedInFirebase || isLoggedInApiState != null) {
-        true -> "homepage"
-        false -> "login"
+//    val startDestination = when ( || apiAuthState != null) {
+//        true -> "homepage"
+//        false -> "login"
+//    }
+
+    val startDestination = when {
+        authViewModel.isLoggedInFirebase -> "homepage"
+        apiAuthState == ApiAuthState.LOADING -> null
+        apiAuthState == ApiAuthState.LOGGED_IN -> "homepage"
+        else -> "login"
     }
+
+    if(startDestination == null) {
+        AuthLoading(modifier = modifier)
+        return
+    }
+
     val context = LocalContext.current
 
     NavHost(navController, startDestination = startDestination, modifier = modifier) {
@@ -88,5 +106,15 @@ fun AuthNavigation(modifier: Modifier = Modifier, authViewModel: AuthViewModel =
                 gotoAddresses = { navController.navigate("addresses_page") }
             )
         }
+    }
+}
+
+@Composable
+fun AuthLoading(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
     }
 }

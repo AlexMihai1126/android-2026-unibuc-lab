@@ -12,6 +12,8 @@ import cst.unibucfmiif2026.data.entities.AddressEntity
 import cst.unibucfmiif2026.data.entities.UserEntity
 import cst.unibucfmiif2026.network.RetrofitClient
 import cst.unibucfmiif2026.network.dto.toEntity
+import cst.unibucfmiif2026.utils.createImagePart
+import cst.unibucfmiif2026.utils.toPlainTextRequestBody
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -41,59 +43,35 @@ class AddressDetailsViewModel(application: Application, val addressId: Long) :
         }
     }
 
-    fun addUserToApi(firstname: String, lastname: String, email: String, avatar: Uri) {
+    fun addUserToApi(firstname: String, lastname: String, email: String, avatar: Uri?) {
         viewModelScope.launch {
             try {
-                // TODO - upload user
-                // val result = RetrofitClient.usersLocalApi.addUser(firstname = firstname, lastname = lastname, email = email, avatar)
-            } catch (e: Exception) {
-
-            }
-            userDao.insert(
-                listOf(
-                    UserEntity(
-                        firstName = firstname,
-                        lastName = lastname,
-                        addressId = addressId
-                    )
+                val avatarPart = avatar?.createImagePart()
+                val result = RetrofitClient.usersLocalApi.addUser(
+                    firstname = firstname.toPlainTextRequestBody(),
+                    lastname = lastname.toPlainTextRequestBody(),
+                    email = email.toPlainTextRequestBody(),
+                    avatar = avatarPart
                 )
-            )
+                if(result.isSuccessful) {
+                    userDao.insert(
+                        listOf(
+                            UserEntity(
+                                firstName = firstname,
+                                lastName = lastname,
+                                addressId = addressId
+                            )
+                        )
+                    )
+                }
+            } catch (err: Exception) {
+                Log.e("UploadUser", "${err.message}")
+            }
         }
     }
 
     // TODO - split navigation file
     // TODO - create reusable composables from form inputs
-    // TODO - improve loading page at app first startup
-// TODO - Uri to Part
-
-//    private fun createImagePart(imageUri: Uri): MultipartBody.Part? {
-//        val contentResolver = getApplication<Application>().contentResolver
-//        val mimeType = contentResolver.getType(imageUri) ?: "image/jpeg"
-//        val imageBytes = contentResolver.openInputStream(imageUri)?.use { inputStream ->
-//            inputStream.readBytes()
-//        } ?: return null
-//        val requestBody = imageBytes.toRequestBody(mimeType.toMediaType())
-//
-//        return MultipartBody.Part.createFormData(
-//            name = "avatar",
-//            filename = contentResolver.getFileName(imageUri),
-//            body = requestBody
-//        )
-//    }
-//
-//    private fun String.toPlainTextRequestBody(): RequestBody =
-//        toRequestBody("text/plain".toMediaType())
-//
-//    private fun ContentResolver.getFileName(uri: Uri): String {
-//        query(uri, null, null, null, null)?.use { cursor ->
-//            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-//            if (nameIndex >= 0 && cursor.moveToFirst()) {
-//                return cursor.getString(nameIndex)
-//            }
-//        }
-//
-//        return "avatar_${System.currentTimeMillis()}.jpg"
-//    }
 
     fun loadUsers() {
         viewModelScope.launch {
