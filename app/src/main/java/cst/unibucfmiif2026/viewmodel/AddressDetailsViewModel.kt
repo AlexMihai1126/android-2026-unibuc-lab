@@ -70,9 +70,6 @@ class AddressDetailsViewModel(application: Application, val addressId: Long) :
         }
     }
 
-    // TODO - split navigation file
-    // TODO - create reusable composables from form inputs
-
     fun loadUsers() {
         viewModelScope.launch {
             try {

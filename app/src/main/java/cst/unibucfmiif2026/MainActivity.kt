@@ -13,16 +13,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import cst.unibucfmiif2026.ui.navigation.AuthNavigation
+import cst.unibucfmiif2026.ui.navigation.AppNavigation
 import cst.unibucfmiif2026.ui.theme.UniBucFMIIF2026Theme
-import cst.unibucfmiif2026.viewmodel.AuthViewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -32,7 +27,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             UniBucFMIIF2026Theme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
-                    AuthNavigation(modifier = Modifier.padding(padding))
+                    AppNavigation(modifier = Modifier.padding(padding))
                 }
             }
         }
@@ -104,6 +99,6 @@ fun GreetingPreview() {
 @Composable
 fun AuthNavPreview() {
     UniBucFMIIF2026Theme {
-        AuthNavigation()
+        AppNavigation()
     }
 }
